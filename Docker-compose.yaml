@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongo_db
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ecommerce_net
+
+  backend:
+    build: ./backend
+    image: yourdockerhub/backend:1.0.0
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/productsdb
+    depends_on:
+      - mongo
+    networks:
+      - ecommerce_net
+
+  client:
+    build: ./client
+    image: yourdockerhub/client:1.0.0
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - ecommerce_net
+
+volumes:
+  mongo_data:
+
+networks:
+  ecommerce_net:
+    driver: bridge
