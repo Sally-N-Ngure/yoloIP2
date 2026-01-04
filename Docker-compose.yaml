@@ -1,39 +1,91 @@
-version: "3.9"
+# Use Docker Compose file format version 3.8.
+# This specifies compatibility with newer Docker features and syntax.
+version: "3.8"
 
+# Define the multi-container application services.
 services:
+
+  # Define the frontend service, labeled 'client'.
+  client:
+    # The 'build' section specifies how to build the Docker image for the client.
+    build:
+      # 'context' tells Docker where to look for the Dockerfile and associated files.
+      # Here, it will look inside the './client' directory relative to this file.
+      context: ./client
+      # Specifies the Dockerfile used to build the image. This allows custom naming if needed.
+      dockerfile: Dockerfile
+    # Names the built image. Useful for pushing to DockerHub or referencing locally.
+    image: snngure/yolo-client:latest
+    # Assigns a fixed container name for easier debugging and consistency.
+    container_name: yolo-client
+    # Maps the container's internal port 3000 (used by most React apps) to the host's port 3000.
+    # This allows the developer or user to access the client app via localhost:3000.
+    ports:
+      - "3000:3000"
+    # Specifies that the 'client' service should only start after the 'backend' is ready.
+    # It does not wait for the backend to be "fully ready", just that the container is running.
+    depends_on: 
+      - backend
+    # Connects this service to a custom Docker network called 'snnetwork'.
+    networks:
+      - snnetwork
+    # Mounts a named volume called 'client_modules' at '/app/node_modules' inside the container.
+    # This ensures node_modules is not overridden during bind-mounting the codebase in dev setups.
+    volumes:
+      - client_modules:/app/node_modules
+
+  # Define the backend service, labeled 'backend'.
+  backend:
+    # Build configuration for the backend image.
+    build:
+      # Tells Docker to look inside the './backend' directory for build context.
+      context: ./backend
+      # Uses the specified Dockerfile inside the backend folder.
+      dockerfile: Dockerfile
+    # Names the Docker image for the backend. Can be pushed or reused.
+    image: snngure/yolo-backend:latest
+    # Assigns a fixed container name to make it easier to refer to in logs or exec commands.
+    container_name: yolo-backend
+    # Exposes the backend's internal port 5000 (commonly used by Express or Flask apps) to the host.
+    ports:
+      - "5000:5000"
+    # Loads environment variables from a .env file located in the backend directory.
+    # This is useful for storing sensitive values like API keys, database URLs, etc.
+    env_file:
+      - ./backend/.env
+    # Connects this service to the same custom network as the client for inter-service communication.
+    networks:
+      - snnetwork
+    # Mounts a named volume 'backend_modules' to persist or isolate node_modules in the container.
+    volumes:
+      - backend_modules:/app/node_modules
+
+  # Add a MongoDB service for data persistence
   mongo:
     image: mongo:6.0
-    container_name: mongo_db
+    container_name: yolo-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
     volumes:
       - mongo_data:/data/db
     networks:
-      - ecommerce_net
+      - snnetwork
 
-  backend:
-    build: ./backend
-    image: yourdockerhub/backend:1.0.0
-    ports:
-      - "5000:5000"
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/productsdb
-    depends_on:
-      - mongo
-    networks:
-      - ecommerce_net
-
-  client:
-    build: ./client
-    image: yourdockerhub/client:1.0.0
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    networks:
-      - ecommerce_net
-
-volumes:
-  mongo_data:
-
+# Define custom Docker networks used by the services.
 networks:
-  ecommerce_net:
+  # Declare a bridge network named 'snnetwork' for internal communication between services.
+  snnetwork:
+    name: snnetwork
+    # 'bridge' is the default Docker network driver for local containers.
+    # It allows the services to communicate with each other using container names.
     driver: bridge
+
+# Define persistent named volumes used by the services to avoid overwriting node_modules.
+volumes:
+  # Volume for the client service's node_modules directory.
+  client_modules:
+  # Volume for the backend service's node_modules directory.
+  backend_modules:
+  # Volume to persist MongoDB data between container restarts
+  mongo_data:
