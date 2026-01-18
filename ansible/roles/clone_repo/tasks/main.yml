@@ -1,0 +1,22 @@
+---
+# Clone repository role - tasks
+- name: Clone YOLO repository
+  ansible.builtin.git:
+    repo: "{{ repo_url }}"
+    dest: "{{ app_directory }}"
+    version: "{{ repo_branch }}"
+    update: yes
+  become_user: "{{ app_user }}"
+  tags:
+    - repo
+    - setup
+
+- name: Set ownership of repository
+  ansible.builtin.file:
+    path: "{{ app_directory }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    recurse: yes
+  tags:
+    - repo
+    - setup

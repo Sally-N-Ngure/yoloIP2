@@ -1,0 +1,28 @@
+---
+# Global variables for YOLO application deployment
+app_name: yolo
+app_user: vagrant
+app_directory: /home/vagrant/yolo
+repo_url: https://github.com/Sally-N-Ngure/yoloIP2.git
+repo_branch: master
+
+# Docker network
+docker_network_name: yolo-network
+
+# MongoDB configuration
+mongo_image: mongo:5.0
+mongo_container_name: mongo
+mongo_port: 27017
+mongo_volume: mongo-data
+
+# Backend configuration
+backend_image: yolo-backend
+backend_container_name: backend
+backend_port: 5000
+backend_dir: "{{ app_directory }}/backend"
+
+# Frontend configuration
+frontend_image: yolo-client
+frontend_container_name: client
+frontend_port: 3000
+frontend_dir: "{{ app_directory }}/client"

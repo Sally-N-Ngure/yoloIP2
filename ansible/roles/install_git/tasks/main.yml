@@ -1,0 +1,10 @@
+---
+# Install Git role - tasks
+- name: Install Git
+  ansible.builtin.apt:
+    name: git
+    state: present
+    update_cache: yes
+  tags:
+    - git
+    - setup

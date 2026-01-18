@@ -1,0 +1,90 @@
+---
+# Backend deployment role - tasks
+- name: Create MongoDB container
+  block:
+    - name: Create MongoDB volume
+      community.docker.docker_volume:
+        name: "{{ mongo_volume }}"
+        state: present
+      tags:
+        - backend
+        - database
+        - deploy
+
+    - name: Start MongoDB container
+      community.docker.docker_container:
+        name: "{{ mongo_container_name }}"
+        image: "{{ mongo_image }}"
+        state: started
+        restart_policy: unless-stopped
+        ports:
+          - "{{ mongo_port }}:{{ mongo_port }}"
+        volumes:
+          - "{{ mongo_volume }}:/data/db"
+        networks:
+          - name: "{{ docker_network_name }}"
+      tags:
+        - backend
+        - database
+        - deploy
+
+    - name: Wait for MongoDB to be ready
+      ansible.builtin.wait_for:
+        port: "{{ mongo_port }}"
+        delay: 5
+        timeout: 60
+      tags:
+        - backend
+        - database
+        - deploy
+
+- name: Create backend .env file
+  ansible.builtin.copy:
+    content: |
+      MONGODB_URI=mongodb://{{ mongo_container_name }}:{{ mongo_port }}/yolomy
+    dest: "{{ backend_dir }}/.env"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0644'
+  tags:
+    - backend
+    - deploy
+    - config
+
+- name: Build backend Docker image
+  community.docker.docker_image:
+    name: "{{ backend_image }}"
+    build:
+      path: "{{ backend_dir }}"
+      dockerfile: Dockerfile
+    source: build
+    state: present
+    force_source: yes
+  tags:
+    - backend
+    - deploy
+    - build
+
+- name: Start backend container
+  community.docker.docker_container:
+    name: "{{ backend_container_name }}"
+    image: "{{ backend_image }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ backend_port }}:{{ backend_port }}"
+    env_file: "{{ backend_dir }}/.env"
+    networks:
+      - name: "{{ docker_network_name }}"
+  tags:
+    - backend
+    - deploy
+
+- name: Wait for backend to be ready
+  ansible.builtin.wait_for:
+    port: "{{ backend_port }}"
+    delay: 10
+    timeout: 120
+  tags:
+    - backend
+    - deploy

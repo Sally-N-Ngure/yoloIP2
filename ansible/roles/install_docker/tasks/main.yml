@@ -1,0 +1,86 @@
+---
+# Install Docker role - tasks
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags:
+    - docker
+    - setup
+
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - python3-pip
+    state: present
+  tags:
+    - docker
+    - setup
+
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  tags:
+    - docker
+    - setup
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  tags:
+    - docker
+    - setup
+
+- name: Install Docker
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+    - setup
+
+- name: Install Docker Python SDK
+  ansible.builtin.pip:
+    name:
+      - docker
+      - docker-compose
+    state: present
+  tags:
+    - docker
+    - setup
+
+- name: Start and enable Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes
+  tags:
+    - docker
+    - setup
+
+- name: Add user to docker group
+  ansible.builtin.user:
+    name: "{{ app_user }}"
+    groups: docker
+    append: yes
+  tags:
+    - docker
+    - setup
+
+- name: Reset connection to apply group changes
+  meta: reset_connection
+  tags:
+    - docker
+    - setup

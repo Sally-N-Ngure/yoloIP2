@@ -1,0 +1,10 @@
+---
+# Network deployment role - tasks
+- name: Create Docker network
+  community.docker.docker_network:
+    name: "{{ docker_network_name }}"
+    driver: bridge
+    state: present
+  tags:
+    - network
+    - deploy

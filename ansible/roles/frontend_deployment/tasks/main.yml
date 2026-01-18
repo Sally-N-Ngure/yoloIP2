@@ -1,0 +1,55 @@
+---
+# Frontend deployment role - tasks
+- name: Build frontend Docker image
+  community.docker.docker_image:
+    name: "{{ frontend_image }}"
+    build:
+      path: "{{ frontend_dir }}"
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_BACKEND_URL: "http://localhost:{{ backend_port }}"
+    source: build
+    state: present
+    force_source: yes
+  tags:
+    - frontend
+    - deploy
+    - build
+
+- name: Start frontend container
+  community.docker.docker_container:
+    name: "{{ frontend_container_name }}"
+    image: "{{ frontend_image }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ frontend_port }}:{{ frontend_port }}"
+    networks:
+      - name: "{{ docker_network_name }}"
+  tags:
+    - frontend
+    - deploy
+
+- name: Wait for frontend to be ready
+  ansible.builtin.wait_for:
+    port: "{{ frontend_port }}"
+    delay: 10
+    timeout: 180
+  tags:
+    - frontend
+    - deploy
+
+- name: Display application URLs
+  ansible.builtin.debug:
+    msg:
+      - "================================================"
+      - "YOLO Application Deployed Successfully!"
+      - "================================================"
+      - "Frontend: http://localhost:{{ frontend_port }}"
+      - "Backend: http://localhost:{{ backend_port }}"
+      - "MongoDB: localhost:{{ mongo_port }}"
+      - "================================================"
+      - "You can now test the application by adding products!"
+  tags:
+    - frontend
+    - deploy
