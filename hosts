@@ -1,2 +1,5 @@
+# Inventory file defining target hosts
+# Points to Vagrant VM via SSH on port 2222
+
 [all]
 ansible_host=127.0.0.1 port=2222
