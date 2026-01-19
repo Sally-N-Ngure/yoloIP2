@@ -4,20 +4,20 @@
 
 - name: Clone YOLO repository
   ansible.builtin.git:
-    repo: "{{ repo_url }}"
-    dest: "{{ app_directory }}"
-    version: "{{ repo_branch }}"
+    repo: "https://github.com/Sally-N-Ngure/yoloIP2.git"
+    dest: "/home/vagrant/yoloIP2"
+    version: "master"
     update: yes
-  become_user: "{{ app_user }}"
+  become_user: "vagrant"
   tags:
     - repo
     - setup
 
 - name: Set ownership of repository
   ansible.builtin.file:
-    path: "{{ app_directory }}"
-    owner: "{{ app_user }}"
-    group: "{{ app_user }}"
+    path: "/home/vagrant/yoloIP2"
+    owner: "vagrant"
+    group: "vagrant"
     recurse: yes
   tags:
     - repo
