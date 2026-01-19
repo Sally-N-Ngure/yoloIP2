@@ -1,5 +1,6 @@
 ---
-# Backend deployment role - tasks
+# Deploy MongoDB and Node.js backend services
+
 - name: Create MongoDB container
   block:
     - name: Create MongoDB volume
@@ -38,6 +39,7 @@
         - database
         - deploy
 
+# Configure backend environment variables
 - name: Create backend .env file
   ansible.builtin.copy:
     content: |
