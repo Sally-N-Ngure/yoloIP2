@@ -1,5 +1,6 @@
 ---
-# Install Docker role - tasks
+# Install Docker and dependencies for container orchestration
+
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: yes
@@ -51,6 +52,7 @@
     - docker
     - setup
 
+# Install Python SDK for Ansible Docker modules
 - name: Install Docker Python SDK
   ansible.builtin.pip:
     name:
