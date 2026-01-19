@@ -1,5 +1,7 @@
 ---
-# Clone repository role - tasks
+# Clone YOLO application repository from GitHub
+# Dependencies: Git must be installed
+
 - name: Clone YOLO repository
   ansible.builtin.git:
     repo: "{{ repo_url }}"
