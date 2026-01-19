@@ -1,5 +1,4 @@
 # Use Docker Compose file format version 3.8.
-# This specifies compatibility with newer Docker features and syntax.
 version: "3.8"
 
 # Define the multi-container application services.
