@@ -1,5 +1,6 @@
 ---
-# Install Git role - tasks
+# Install Git for repository cloning
+
 - name: Install Git
   ansible.builtin.apt:
     name: git
