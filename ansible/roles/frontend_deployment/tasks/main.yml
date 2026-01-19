@@ -1,5 +1,6 @@
 ---
-# Frontend deployment role - tasks
+# Deploy React frontend with backend API configuration
+
 - name: Build frontend Docker image
   community.docker.docker_image:
     name: "{{ frontend_image }}"
