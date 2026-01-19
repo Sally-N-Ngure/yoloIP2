@@ -1,3 +1,6 @@
+# Main playbook for deploying YOLO e-commerce application
+# Orchestrates Docker installation, repo cloning, and container deployment
+
 - name: Deploy YOLO on VM using Ansible
   hosts: all
   become: yes
