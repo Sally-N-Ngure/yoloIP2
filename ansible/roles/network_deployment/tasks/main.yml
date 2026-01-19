@@ -1,5 +1,6 @@
 ---
-# Network deployment role - tasks
+# Create Docker bridge network for container communication
+
 - name: Create Docker network
   community.docker.docker_network:
     name: "{{ docker_network_name }}"
