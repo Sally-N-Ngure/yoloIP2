@@ -64,7 +64,19 @@ spec:
   - port: 80
     targetPort: 80
 
-# --- MONGODB ---
+# 1. Ask Google for a 1GB Disk
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# 2. Mount that Disk into the Container
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -84,18 +96,27 @@ spec:
         image: mongo:6.0
         ports:
         - containerPort: 27017
+        # Mount the volume to the data directory
+        volumeMounts:
+        - mountPath: /data/db
+          name: mongo-storage
+      # Define the volume using the Claim we made above
+      volumes:
+      - name: mongo-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-service # This replaces "yolo-mongo" in your connection string
+  name: mongo-service
 spec:
   selector:
     app: mongo
   ports:
   - port: 27017
     targetPort: 27017
----
+
 # --- BACKEND ---
 apiVersion: apps/v1
 kind: Deployment
