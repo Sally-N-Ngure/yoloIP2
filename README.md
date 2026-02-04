@@ -71,9 +71,14 @@ When prompted for the Vault password, enter: **12345**
 
 Once deployment completes (5-10 minutes), access the application:
 
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
-- **MongoDB**: localhost:27017
+- **Frontend (local dev)**: http://localhost:3000
+- **Backend API (local dev)**: http://localhost:5000
+- **MongoDB (local dev)**: localhost:27017
+
+If you deployed to Google Kubernetes Engine (GKE), a public frontend URL is available:
+
+- **Frontend (GKE live)**: http://34.134.212.39
+- **Backend (GKE external IP)**: http://136.112.168.236/api/products
 
 ### 4. Test the Application
 
@@ -540,3 +545,44 @@ For issues or questions:
 3. Verify with tags: `vagrant provision -- --tags "verify"`
 
 **Happy Deploying! 🚀**
+
+---
+
+## Deploy to Google Kubernetes Engine (GKE)
+
+This repository includes Kubernetes manifests in the `k8s/` directory and a helper deploy script `scripts/deploy_gke.sh`.
+
+Quick deploy steps (summary):
+
+1. Build and push your Docker images to Docker Hub. Use clear tags, for example:
+
+```bash
+docker build -t <dockerhub-username>/yolo-backend:v1.0 ./backend
+docker push <dockerhub-username>/yolo-backend:v1.0
+
+docker build -t <dockerhub-username>/yolo-frontend:v1.0 ./client
+docker push <dockerhub-username>/yolo-frontend:v1.0
+```
+
+2. Update the image placeholders in `k8s/05-backend-deployment.yaml` and `k8s/07-frontend-deployment.yaml` with your pushed image names.
+
+3. Configure `gcloud` and run the deploy script (edit `PROJECT`, `CLUSTER`, `ZONE` env values first):
+
+```bash
+export PROJECT=my-gcp-project
+export CLUSTER=yolo-cluster
+export ZONE=us-central1-a
+bash scripts/deploy_gke.sh
+```
+
+4. Get the frontend external IP:
+
+```bash
+kubectl get svc frontend -n yolo
+```
+
+Place the resulting external IP:port below for grading.
+
+Live URL: <external-ip>:80
+
+See `explanation.md` for design rationale matching the rubric.
