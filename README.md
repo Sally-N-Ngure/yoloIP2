@@ -550,39 +550,33 @@ For issues or questions:
 
 ## Deploy to Google Kubernetes Engine (GKE)
 
-This repository includes Kubernetes manifests in the `k8s/` directory and a helper deploy script `scripts/deploy_gke.sh`.
+This repository includes Kubernetes manifests in the `k8s/` directory .
 
 Quick deploy steps (summary):
 
-1. Build and push your Docker images to Docker Hub. Use clear tags, for example:
-
+1. Build and push images:
 ```bash
-docker build -t <dockerhub-username>/yolo-backend:v1.0 ./backend
-docker push <dockerhub-username>/yolo-backend:v1.0
+docker build -t snngure/yoloip2-backend:v1.0 ./backend
+docker push snngure/yoloip2-backend:v1.0
 
-docker build -t <dockerhub-username>/yolo-frontend:v1.0 ./client
-docker push <dockerhub-username>/yolo-frontend:v1.0
+docker build -t snngure/yoloip2-frontend:v1.0 ./client
+docker push snngure/yoloip2-frontend:v1.0
 ```
 
-2. Update the image placeholders in `k8s/05-backend-deployment.yaml` and `k8s/07-frontend-deployment.yaml` with your pushed image names.
-
-3. Configure `gcloud` and run the deploy script (edit `PROJECT`, `CLUSTER`, `ZONE` env values first):
-
+2. Configure GCP and export variables:
 ```bash
-export PROJECT=my-gcp-project
-export CLUSTER=yolo-cluster
+export PROJECT=project-5a16ba60-1bd6-4e78-a9f
+export CLUSTER=yoloip2-cluster
 export ZONE=us-central1-a
-bash scripts/deploy_gke.sh
 ```
 
-4. Get the frontend external IP:
-
+3. `kubectl apply -f k8s/deployment.yaml` then get the frontend IP:
 ```bash
-kubectl get svc frontend -n yolo
+kubectl get svc 
 ```
 
-Place the resulting external IP:port below for grading.
+---
 
-Live URL: <external-ip>:80
+Live URL: (http://34.132.107.209)
 
 See `explanation.md` for design rationale matching the rubric.
