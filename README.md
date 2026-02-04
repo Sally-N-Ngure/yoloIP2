@@ -579,4 +579,4 @@ kubectl get svc
 
 Live URL: (http://34.132.107.209)
 
-See `explanation.md` for design rationale matching the rubric.
+See `explanation.md` for more on deploying on GKE
