@@ -1,10 +1,9 @@
-Kubernetes Deployment Plan for IP2 Application
+## Kubernetes Deployment Plan for IP2 Application
 
-The public URL of the frontend will be the external IP provisioned by the GKE `LoadBalancer` service. Replace the placeholder below after deployment:
+The public URL of the frontend will be the external IP provisioned by the GKE `LoadBalancer` service.
 
-Public URL (frontend): http://34.134.212.39:80
+Public URL (frontend): http://34.132.107.209
 
-Backend external endpoint (API): http://136.112.168.236/api/products
 
 ## Overview
 
@@ -19,8 +18,7 @@ The application is composed of three main components that communicate within the
 1. **Frontend**
 
 	- A React.js single-page application packaged into a Docker image and pushed to Docker Hub as `snngure/yoloip2-frontend:v1.0`.
-	- For this deployment the frontend bundle was temporarily patched in the running pod to point at the backend external IP `http://136.112.168.236` so the UI can POST products.
-	- Recommended (permanent): rebuild the frontend with an environment-driven backend URL (e.g., `REACT_APP_BACKEND_URL`) or use a reverse-proxy so the frontend uses relative `/api` paths.
+	- For this deployment the frontend bundle was temporarily patched in the running pod to point at the backend external IP `http://34.132.107.209` so the UI can POST products.
 
 2. **Backend**
 
@@ -98,14 +96,14 @@ docker push snngure/yoloip2-frontend:v1.0
 
 2. Configure GCP and export variables:
 ```bash
-export PROJECT=your-gcp-project-id
-export CLUSTER=yolo-cluster
+export PROJECT=project-5a16ba60-1bd6-4e78-a9f
+export CLUSTER=yoloip2-cluster
 export ZONE=us-central1-a
 ```
 
 3. Run `scripts/deploy_gke.sh` or `kubectl apply -f k8s/` then get the frontend IP:
 ```bash
-kubectl get svc frontend -n yolo
+kubectl get svc 
 ```
 
 ---
@@ -114,44 +112,3 @@ kubectl get svc frontend -n yolo
 
 
 - **K8s objects**: StatefulSet for DB, Deployments for backend/frontend, Services (ClusterIP and LoadBalancer) are used.
-
-
----
-# Tag and Push Frontend
-docker tag snngure/yoloip2-frontend:v1 us-central1-docker.pkg.dev/project-5a16ba60-1bd6-4e78-a9f/my-website/frontend:v1
-docker push us-central1-docker.pkg.dev/project-5a16ba60-1bd6-4e78-a9f/my-website/frontend:v1
-
-# Tag and Push Backend
-docker tag snngure/yoloip2-backend:v1.0 us-central1-docker.pkg.dev/project-5a16ba60-1bd6-4e78-a9f/my-website/backend:v1
-docker push us-central1-docker.pkg.dev/project-5a16ba60-1bd6-4e78-a9f/my-website/backend:v1
-
-gcloud container clusters create-auto my-cluster \
-    --region us-central1 \
-    --project project-5a16ba60-1bd6-4e78-a9f
-
-NAME: tagKeys/281483108080071
-SHORT_NAME: environment
-DESCRIPTION: Environment type for GKE resources
-
-NAME: tagValues/281481891078119
-SHORT_NAME: prod
-DESCRIPTION: 
-
-NAME: my-cluster
-LOCATION: us-central1
-MASTER_VERSION: 1.33.5-gke.2118001 (! 13 days left !)
-MASTER_IP: 34.121.46.126
-MACHINE_TYPE: ek-standard-8
-NODE_VERSION: 1.33.5-gke.2118001
-NUM_NODES: 3
-STATUS: ERROR
-STACK_TYPE: IPV4
-
-NAME: yoloip2-cluster
-LOCATION: us-central1-a
-MASTER_VERSION: 1.33.5-gke.2118001
-MASTER_IP: 35.226.202.179
-MACHINE_TYPE: e2-medium
-NODE_VERSION: 1.33.5-gke.2118001
-NUM_NODES: 2
-STATUS: RUNNING
