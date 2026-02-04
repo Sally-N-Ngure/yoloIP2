@@ -146,7 +146,7 @@ kind: Service
 metadata:
   name: backend-service
 spec:
-  type: LoadBalancer # Needed so the browser/frontend can talk to it
+  type: ClusterIP # Internal only: avoid exposing backend externally
   selector:
     app: backend
   ports:

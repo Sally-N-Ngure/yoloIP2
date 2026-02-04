@@ -17,7 +17,13 @@ router.get('/', (req,res)=>{
 // @route POST /products
 // @desc  Create a product
 router.post('/', (req,res)=>{
-    
+    console.log('POST /api/products - body:', req.body)
+
+    // Basic validation
+    if (!req.body || !req.body.name) {
+        return res.status(400).json({ error: 'Missing required field: name' })
+    }
+
     // Create a product item
     const newProduct = new Product({
         name: req.body.name,
@@ -27,7 +33,10 @@ router.post('/', (req,res)=>{
     });
 
     newProduct.save((err, product)=>{
-        if (err) console.log(err)
+        if (err) {
+            console.log(err)
+            return res.status(500).json({ error: 'Failed to save product' })
+        }
         res.json(product)
     })
 })

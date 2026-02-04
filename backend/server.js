@@ -1,8 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const multer = require('multer');
-const upload = multer();
+// Remove global multer middleware (interferes with JSON body parsing)
 
 const productRoute = require('./routes/api/productRoute');
 
@@ -30,11 +29,9 @@ const app = express()
 
 // Body parser middleware
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 
-// 
-app.use(upload.array()); 
-
-// Cors 
+// Cors
 app.use(cors());
 
 // Use Route
