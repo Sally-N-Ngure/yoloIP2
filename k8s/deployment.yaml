@@ -1,0 +1,166 @@
+# --- BACKEND ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend-api
+        image: us-central1-docker.pkg.dev/project-5a16ba60-1bd6-4e78-a9f/my-repo/backend:v1
+        ports:
+        - containerPort: 5000 # Assume your API runs here
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  type: ClusterIP # Internal only! Secure.
+  selector:
+    app: backend
+  ports:
+  - port: 80
+    targetPort: 5000
+---
+# --- FRONTEND ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend-web
+        image: us-central1-docker.pkg.dev/project-5a16ba60-1bd6-4e78-a9f/my-repo/frontend:v1
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  type: LoadBalancer # Publicly accessible
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+
+# --- MONGODB ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:6.0
+        ports:
+        - containerPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service # This replaces "yolo-mongo" in your connection string
+spec:
+  selector:
+    app: mongo
+  ports:
+  - port: 27017
+    targetPort: 27017
+---
+# --- BACKEND ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend-api
+        image: snngure/yolo-backend:latest # Using your DockerHub image
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MONGO_URI
+          value: "mongodb://mongo-service:27017/yolo" # Point to the K8s service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  type: LoadBalancer # Needed so the browser/frontend can talk to it
+  selector:
+    app: backend
+  ports:
+  - port: 80
+    targetPort: 5000
+---
+# --- FRONTEND ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend-web
+        image: snngure/yolo-client:latest # Using your DockerHub image
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 3000
