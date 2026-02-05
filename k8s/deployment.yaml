@@ -134,7 +134,7 @@ spec:
     spec:
       containers:
       - name: backend-api
-        image: snngure/yolo-backend:latest # Using your DockerHub image
+        image: snngure/yolo-backend:latest # Using my DockerHub image
         ports:
         - containerPort: 5000
         env:
@@ -170,7 +170,7 @@ spec:
     spec:
       containers:
       - name: frontend-web
-        image: snngure/yolo-client:latest # Using your DockerHub image
+        image: snngure/yolo-client:latest # Using my DockerHub image
         ports:
         - containerPort: 3000
 ---
