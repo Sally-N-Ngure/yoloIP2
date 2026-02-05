@@ -577,6 +577,6 @@ kubectl get svc
 
 ---
 
-Live URL: (http://34.132.107.209)
+Live URL: (http://136.119.149.215)
 
 See `explanation.md` for more on deploying on GKE
