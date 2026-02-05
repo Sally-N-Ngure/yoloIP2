@@ -2,8 +2,7 @@
 
 The public URL of the frontend will be the external IP provisioned by the GKE `LoadBalancer` service.
 
-Public URL (frontend): http://34.132.107.209
-
+Public URL (frontend): http://136.119.149.215
 
 ## Overview
 
@@ -18,7 +17,7 @@ The application is composed of three main components that communicate within the
 1. **Frontend**
 
 	- A React.js single-page application packaged into a Docker image and pushed to Docker Hub as `snngure/yoloip2-frontend:v1.0`.
-	- For this deployment the frontend bundle was temporarily patched in the running pod to point at the backend external IP `http://34.132.107.209` so the UI can POST products.
+	- For this deployment the frontend bundle was temporarily patched in the running pod to point at the backend external IP `http://136.119.149.215` so the UI can POST products.
 
 2. **Backend**
 
@@ -101,7 +100,7 @@ export CLUSTER=yoloip2-cluster
 export ZONE=us-central1-a
 ```
 
-3. Run `scripts/deploy_gke.sh` or `kubectl apply -f k8s/` then get the frontend IP:
+3. Run `kubectl apply -f k8s/deployment.yaml` then get the frontend IP:
 ```bash
 kubectl get svc 
 ```
